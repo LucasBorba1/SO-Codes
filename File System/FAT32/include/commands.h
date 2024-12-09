@@ -2,7 +2,7 @@
 #define COMMANDS_H
 
 #include <stdbool.h>
-#include "fat16.h"
+#include "fat32.h"
 
 /*
  * Esta struct encapsula o resultado de find(), carregando informações sobre a
@@ -19,10 +19,10 @@ struct far_dir_searchres
  * Esta struct encapsula o resultado de fat16_find_free_cluster()
  *
  */
-struct fat16_newcluster_info
+struct fat32_newcluster_info
 {
-	uint16_t cluster;
-	uint32_t address;
+	uint32_t cluster;   // Cluster encontrado (32 bits)
+	uint32_t address;   // Endereço correspondente na tabela FAT
 };
 
 
@@ -48,7 +48,7 @@ void cat(FILE* fp, char* filename, struct fat_bpb* bpb);
 struct far_dir_searchres find_in_root(struct fat_dir *dirs, char *filename, struct fat_bpb *bpb);
 
 /* Procura cluster vazio */
-struct fat16_newcluster_info fat16_find_free_cluster(FILE* fp, struct fat_bpb* bpb);
+struct fat32_newcluster_info fat32_find_free_cluster(FILE* fp, struct fat_bpb* bpb);
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
