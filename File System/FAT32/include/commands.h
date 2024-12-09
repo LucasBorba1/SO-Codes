@@ -45,7 +45,7 @@ void cp(FILE* fp, char* source, char* dest, struct fat_bpb* bpb);
 void cat(FILE* fp, char* filename, struct fat_bpb* bpb);
 
 /* helper function: find specific filename in fat_dir */
-struct far_dir_searchres find_in_root(struct fat_dir *dirs, char *filename, struct fat_bpb *bpb);
+struct far_dir_searchres find_in_root(FILE *fp, char *filename, struct fat_bpb *bpb);
 
 /* Procura cluster vazio */
 struct fat32_newcluster_info fat32_find_free_cluster(FILE* fp, struct fat_bpb* bpb);

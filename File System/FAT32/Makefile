@@ -1,32 +1,45 @@
+# Diretórios
 INCLUDE = include
 SOURCE  = source
 BUILD   = build
 
+# Compilador e argumentos
 CC    = cc
 CARGS = -Wall -Wextra -g -O0 -I$(INCLUDE) -pedantic -std=c11
 
-OBJS    = $(shell find $(SOURCE) -type f -name '*.c' | sed 's/\.c*$$/\.o/; s/$(SOURCE)\//$(BUILD)\//')
-HEADERS = $(shell find $(INCLUDE) -type f -name '*.h')
+# Nome do executável
+NAME = fat32_fs
 
-NAME = obese16
+# Listagem de objetos e cabeçalhos
+OBJS    = $(patsubst $(SOURCE)/%.c,$(BUILD)/%.o,$(wildcard $(SOURCE)/*.c))
+HEADERS = $(wildcard $(INCLUDE)/*.h)
 
-.PHONY: builddir
+# Alvos principais
+.PHONY: all builddir clean resetimg
 
 all: $(NAME)
 
-builddir:
-	@if [ ! -d "build" ] ; then mkdir build ; fi
-
+# Reset da imagem de disco
 resetimg:
 	@cp -v backup.img disk.img
+	@echo "Imagem de disco restaurada para o estado original."
 
-$(OBJS): $(BUILD)/%.o: $(SOURCE)/%.c $(HEADERS)
-	@$(CC) -c $(CARGS) $< -o $@
+# Criação do diretório de build
+builddir:
+	@mkdir -p $(BUILD)
+
+# Compilação de objetos
+$(BUILD)/%.o: $(SOURCE)/%.c $(HEADERS)
+	$(CC) -c $(CARGS) $< -o $@
 	@echo 'CC   ' $<
 
+# Limpeza de arquivos gerados
 clean:
-	@rm -vf $(NAME) $(UBJS) $(OBJS)
+	@rm -vf $(NAME) $(OBJS)
+	@rm -vf disk.img
+	@echo 'Cleaned build files.'
 
+# Linkagem final
 $(NAME): builddir $(OBJS)
-	@$(CC) $(CARGS) $(OBJS) -o $@
+	$(CC) $(CARGS) $(OBJS) -o $@
 	@echo 'CCLD ' $(NAME)
