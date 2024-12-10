@@ -1,8 +1,8 @@
 # Resumo
 
-Sistema de arquivo FAT16 para disciplina de Sistemas Operacionais.
+Sistema de arquivo FAT32 para disciplina de Sistemas Operacionais.
 
-Atualizado por Larissa de Souza, Paulo Hermans e Vinícius Schütz Piva.
+Atualizado por Larissa Fantin, Lucas Borba e Thiago Andrade.
 
 # Instruções de Compilação
 
@@ -15,12 +15,13 @@ O sistema deve ter um compilador GCC 11+, com suporte à C11, e GNU Make.
 Para compilar, rode:
 
 ```
-$ make resetimg obese16
+$ make fat32_fs
 ```
 
 Para executar, rode:
+
 ```
-$ ./obese16 <COMANDO> [ARGUMENTOS] <DISCO>
+$ ./fat32_fs <COMANDO> [ARGUMENTOS] <DISCO>
 ```
 
 ### Windows
@@ -42,36 +43,29 @@ Os seguintes comandos foram implementados:
 Por exemplo, para listar os arquivos:
 
 ```
-$ ./obese16 ls disk.img
+$ ./fat32_fs ls disk_fat32.img
 ```
 
 Para mover um arquivo:
 
 ```
-$ ./obese16 mv teste.txt other.exe disk.img
+$ ./fat32_fs mv teste.txt other.exe disk_fat32.img
 ```
 
 Para remover um arquivo:
 
 ```
-$ ./obese16 rm texto2.txt disk.img
+$ ./fat32_fs rm texto2.txt disk_fat32.img
 ```
 
 Para copiar um arquivo:
 
 ```
-$ ./obese16 cp texto2.txt novo.txt disk.img
+$ ./fat32_fs cp texto2.txt novo.txt disk_fat32.img
 ```
 
 Para imprimir um arquivo:
 
 ```
-$ ./obese16 cat teste.txt disk.img
+$ ./fat32_fs cat teste.txt disk_fat32.img
 ```
-
-# Guia Documentação
-
-Veja na pasta `docs/` os arquivos `FAT16.md`, `API.md` e `Guia.md`. O código em
-sí também foi altamente documentado.
-
-O arquivo para implementação das funções é o `source/commands.c`.
