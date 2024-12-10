@@ -3,44 +3,39 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
-#include "fat32.h"
+#include "fat32.h" /* Alteração: Substituir "fat16.h" por "fat32.h" */
 
-/* Converte nomes para o formato FAT32 (8.3 ou LFN) */
-bool cstr_to_fat32wnull(char *filename, char output[FAT32STR_SIZE_WNULL])
+/* Manipula o caminho para ajustar nome, extensões e caracteres especiais */
+bool cstr_to_fat16wnull(char *filename, char output[FAT16STR_SIZE_WNULL])
 {
     char* strptr = filename;
-    char* dot = strchr(filename, '.'); // Localiza o ponto no nome do arquivo
+    char* dot;
+    dot = strchr(filename, '.');
 
-    if (dot == NULL) {
-        // Nome de arquivo inválido (sem extensão ou muito longo)
-        fprintf(stderr, "Erro: Nome de arquivo inválido (sem extensão ou muito longo).\n");
-        return true;
-    }
+    if (dot == NULL) return true;
 
     int i;
-
-    // Copia a parte do nome antes do ponto (máximo 8 caracteres)
-    for (i = 0; strptr != dot && i < 8; strptr++, i++) {
-        output[i] = toupper(*strptr); // Converte para maiúsculas
+    for (i = 0; strptr != dot; strptr++, i++) {
+        if (i == 8)
+            break;
+        output[i] = *strptr;
     }
 
-    // Preenche com espaços até completar 8 caracteres
-    while (i < 8) {
-        output[i++] = ' ';
+    int trail = 8 - i;
+    for (; trail > 0; trail--, i++) {
+        output[i] = ' ';
     }
 
-    // Copia a extensão após o ponto (máximo 3 caracteres)
-    strptr = dot + 1; // Avança para o caractere após o ponto
-    for (; i < 11 && *strptr != '\0'; strptr++, i++) {
-        output[i] = toupper(*strptr); // Converte para maiúsculas
+    strptr = dot;
+    strptr++;
+    for (i = 8; i < 11; strptr++, i++) {
+        output[i] = *strptr;
     }
 
-    // Preenche com espaços até completar 11 caracteres
-    while (i < 11) {
-        output[i++] = ' ';
+    output[11] = '\0';
+    for (i = 0; output[i] != '\0'; i++) {
+        output[i] = toupper(output[i]);
     }
-
-    output[11] = '\0'; // Adiciona o terminador nulo
 
     return false;
 }

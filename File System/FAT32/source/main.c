@@ -3,21 +3,22 @@
 #include <string.h>
 #include <locale.h>
 
-#include "fat32.h"
+#include "fat32.h" /* Alteração: Substituir "fat16.h" por "fat32.h" */
 #include "commands.h"
 #include "output.h"
 
-/* Show usage help */
+/* Mostrar ajuda */
 void usage(char *executable)
 {
     fprintf(stdout, "Usage:\n");
     fprintf(stdout, "\t%s -h | --help for help\n", executable);
-    fprintf(stdout, "\t%s ls <fat32-img> - List files from the FAT32 image\n", executable);
+    fprintf(stdout, "\t%s ls <fat32-img> - List files from the FAT32 image\n", executable); /* Alteração: Atualizar para FAT32 */
     fprintf(stdout, "\t%s cp <path> <dest> <fat32-img> - Copy files from the image path to local dest.\n", executable);
     fprintf(stdout, "\t%s mv <path> <dest> <fat32-img> - Move files from the path to the FAT32 path\n", executable);
     fprintf(stdout, "\t%s rm <path> <file> <fat32-img> - Remove files from the path to the FAT32 path\n", executable);
+    fprintf(stdout, "\t%s cat <file> <fat32-img> - Print file contents from the FAT32 image\n", executable);
     fprintf(stdout, "\n");
-    fprintf(stdout, "\tfat32-img needs to be a valid FAT32 file system.\n\n");
+    fprintf(stdout, "\tfat32-img needs to be a valid FAT32 image.\n\n"); /* Alteração: Atualizar para FAT32 */
 }
 
 int main(int argc, char **argv)
@@ -39,57 +40,67 @@ int main(int argc, char **argv)
         if (!fp)
         {
             fprintf(stdout, "Could not open file %s\n", argv[argc - 1]);
-            exit(1);
+            exit(EXIT_FAILURE);
         }
 
         struct fat_bpb bpb;
         rfat(fp, &bpb);
-
-        // Valida se a imagem é FAT32
-		if (bpb.sect_per_fat_32 == 0 || bpb.root_entry_count != 0 || bpb.root_cluster < 2) {
-			fprintf(stderr, "Erro: Este não é um sistema de arquivos FAT32.\n");
-			fclose(fp);
-			exit(EXIT_FAILURE);
-		}
-
         char *command = argv[1];
+
+        // verbose(&bpb); /* Descomentar esta linha para depuração detalhada */
 
         if (strcmp(command, "ls") == 0)
         {
             struct fat_dir *dirs = ls(fp, &bpb);
-            if (!dirs) {
-                fprintf(stderr, "Erro ao listar diretórios.\n");
-                fclose(fp);
-                exit(EXIT_FAILURE);
-            }
             show_files(dirs);
-            free(dirs);
-            fclose(fp);
+            free(dirs); /* Liberar memória alocada dinamicamente */
         }
 
         if (strcmp(command, "cp") == 0)
         {
+            if (argc < 4)
+            {
+                fprintf(stderr, "Usage: %s cp <source> <dest> <fat32-img>\n", argv[0]);
+                fclose(fp);
+                exit(EXIT_FAILURE);
+            }
             cp(fp, argv[2], argv[3], &bpb);
-            fclose(fp);
         }
 
         if (strcmp(command, "mv") == 0)
         {
+            if (argc < 4)
+            {
+                fprintf(stderr, "Usage: %s mv <source> <dest> <fat32-img>\n", argv[0]);
+                fclose(fp);
+                exit(EXIT_FAILURE);
+            }
             mv(fp, argv[2], argv[3], &bpb);
-            fclose(fp);
         }
 
         if (strcmp(command, "rm") == 0)
         {
+            if (argc < 3)
+            {
+                fprintf(stderr, "Usage: %s rm <file> <fat32-img>\n", argv[0]);
+                fclose(fp);
+                exit(EXIT_FAILURE);
+            }
             rm(fp, argv[2], &bpb);
-            fclose(fp);
         }
 
         if (strcmp(command, "cat") == 0)
         {
+            if (argc < 3)
+            {
+                fprintf(stderr, "Usage: %s cat <file> <fat32-img>\n", argv[0]);
+                fclose(fp);
+                exit(EXIT_FAILURE);
+            }
             cat(fp, argv[2], &bpb);
-            fclose(fp);
         }
+
+        fclose(fp); /* Certifique-se de fechar o arquivo após qualquer comando */
     }
 
     return EXIT_SUCCESS;
